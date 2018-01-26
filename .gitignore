@@ -99,3 +99,12 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# pipenv: https://github.com/kennethreitz/pipenv
+/Pipfile
+
+# Pycharm generated files
+.idea/
+
+# Default development database
+/app.db
