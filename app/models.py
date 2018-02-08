@@ -6,10 +6,12 @@ from sqlalchemy_utils.types.choice import ChoiceType
 from app import constants, db
 
 
-class TimestampableModelMixin(db.Model):
-    """Base providing generic date fields common to many models."""
+class BaseModelMixin(db.Model):
+    """Base providing generic fields common to many models."""
 
     __abstract__ = True
+
+    id = db.Column(db.Integer, primary_key=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -29,23 +31,19 @@ purchase_pledgers = db.Table(
 )
 
 
-class Purchase(TimestampableModelMixin):
+class Purchase(BaseModelMixin):
     """Describe a purchase made by using pledg."""
-
-    id = db.Column(db.Integer, primary_key=True)
 
     uuid = db.Column(db.String(36), unique=True, nullable=False)
 
-    STATES = [
-        (constants.STATE_INITIALIZED, 'Initialized'),
-        (constants.STATE_SUCCESS, 'Success'),
-        (constants.STATE_FAILED, 'Failed'),
-    ]
-
-    status = db.Column(ChoiceType(STATES), nullable=False)
+    status = db.Column(
+        ChoiceType(constants.STATES),
+        nullable=False,
+        default=constants.STATE_INITIALIZED
+    )
 
     # This is the total amount for the purchase. It is supposed to be divided in many shares.
-    amount = db.Column(db.Float, nullable=False, default=constants.STATE_INITIALIZED)
+    amount = db.Column(db.Float, nullable=False)
 
     # TODO: Not sure right know about how to handle the product as it below to the merchants.
 
@@ -67,10 +65,8 @@ class Purchase(TimestampableModelMixin):
     shares = db.relationship('Share', backref='purchase', lazy=True)
 
 
-class Pledger(TimestampableModelMixin):
+class Pledger(BaseModelMixin):
     """Describe a contributor to a Purchase."""
-
-    id = db.Column(db.Integer, primary_key=True)
 
     email = db.Column(EmailType)
 
@@ -80,13 +76,12 @@ class Pledger(TimestampableModelMixin):
     shares = db.relationship('Share', backref='pledger', lazy=True)
 
 
-class Share(TimestampableModelMixin):
-
-    id = db.Column(db.Integer, primary_key=True)
+class Share(BaseModelMixin):
 
     uuid = db.Column(db.String(36), unique=True, nullable=False)
 
     pledger_id = db.Column(db.Integer, db.ForeignKey('pledger.id'), nullable=False)
     purchase_id = db.Column(db.Integer, db.ForeignKey('purchase.id'), nullable=False)
 
-    # TODO: should a Share have a dedicated amount?
+    # This is the amount the pledger have to pay as a part of the total purchase amount.
+    amount = db.Column(db.Float, nullable=False)
