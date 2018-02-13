@@ -1,8 +1,8 @@
 """Project init
 
-Revision ID: d0fb624563fd
+Revision ID: 720386a0ad22
 Revises: 
-Create Date: 2018-02-08 20:39:22.630503
+Create Date: 2018-02-13 23:34:15.588975
 
 """
 from alembic import op
@@ -11,9 +11,8 @@ import sqlalchemy_utils
 
 from app.models import constants
 
-
 # revision identifiers, used by Alembic.
-revision = 'd0fb624563fd'
+revision = '720386a0ad22'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,7 +25,8 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('email', sqlalchemy_utils.types.email.EmailType(length=255), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('purchase',
     sa.Column('id', sa.Integer(), nullable=False),

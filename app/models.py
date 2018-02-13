@@ -60,8 +60,7 @@ class Purchase(BaseModelMixin):
     pledgers = db.relationship(
         'Pledger',
         secondary=purchase_pledgers,
-        lazy='subquery',
-        backref=db.backref('purchase', lazy=True),
+        backref=db.backref('purchase'),
     )
 
     # A purchase is divided in many shares depending of the number of contributors.

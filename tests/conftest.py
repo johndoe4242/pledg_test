@@ -44,7 +44,6 @@ def db(request):
     return _db
 
 
-# @pytest.fixture(scope='function')
 @pytest.fixture(scope='class')
 def session(db, request):
     """Creates a new database session for a test."""
