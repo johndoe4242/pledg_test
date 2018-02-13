@@ -25,7 +25,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('email', sqlalchemy_utils.types.email.EmailType(length=255), nullable=True),
+    sa.Column('email', sqlalchemy_utils.types.email.EmailType(length=255), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('purchase',

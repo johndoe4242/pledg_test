@@ -108,3 +108,5 @@ ENV/
 
 # Default development database
 /app.db
+
+/.pytest_cache/

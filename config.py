@@ -13,6 +13,9 @@ class Config(object):
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    def __init__(self):
+        print('Using {} ...'.format(self.__class__.__name__))
+
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -22,10 +25,11 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
 
-    def __init__(self):
-        print('Using dev config ...')
-        super().__init__()
+
+TEST_DB = 'test_pledg_lite.db'
+TEST_DB_PATH = "/opt/project/data/{}".format(TEST_DB)
 
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + TEST_DB_PATH

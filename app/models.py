@@ -1,4 +1,7 @@
 from datetime import datetime
+import uuid
+
+from sqlalchemy import event
 
 from sqlalchemy_utils import EmailType
 from sqlalchemy_utils.types.choice import ChoiceType
@@ -68,7 +71,7 @@ class Purchase(BaseModelMixin):
 class Pledger(BaseModelMixin):
     """Describe a contributor to a Purchase."""
 
-    email = db.Column(EmailType)
+    email = db.Column(EmailType, unique=True, nullable=False)
 
     initiated_purchases = db.relationship('Purchase', backref='leader', lazy=True)
     purchases = db.relationship('Purchase', backref='pledger', lazy=True)
@@ -85,3 +88,12 @@ class Share(BaseModelMixin):
 
     # This is the amount the pledger have to pay as a part of the total purchase amount.
     amount = db.Column(db.Float, nullable=False)
+
+
+def generate_uuid_before_insert_listener(mapper, connection, target):
+    """Generate and assign a uuid to the target model before to insert it into the database."""
+    target.uuid = str(uuid.uuid4())
+
+
+event.listen(Share, 'before_insert', generate_uuid_before_insert_listener)
+event.listen(Purchase, 'before_insert', generate_uuid_before_insert_listener)
