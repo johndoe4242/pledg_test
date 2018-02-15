@@ -7,3 +7,5 @@ STATES = [
     (STATE_SUCCESS, 'Success'),
     (STATE_FAILED, 'Failed'),
 ]
+
+HTTP_OK = 200

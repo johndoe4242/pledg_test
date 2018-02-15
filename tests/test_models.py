@@ -22,12 +22,13 @@ def test_pledger_insert_with_email(session):
 def test_pledger_unique_email(session):
     """Assert that an Integrity error is raised if trying to save two pledgers with a same email
     address."""
+    # We add the same user twice to test the `email` field.
+    session.add_all([
+        Pledger(email='jean.valjean@gmail.com'),
+        Pledger(email='jean.valjean@gmail.com')
+    ])
     with pytest.raises(IntegrityError):
-        # We add the same user twice to test the `email` field.
-        session.bulk_save_objects([
-            Pledger(email='jean.valjean@gmail.com'),
-            Pledger(email='jean.valjean@gmail.com')
-        ])
+        session.commit()
 
 
 def test_purchase_insert(session):

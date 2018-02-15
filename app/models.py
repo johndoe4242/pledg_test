@@ -66,6 +66,16 @@ class Purchase(BaseModelMixin):
     # A purchase is divided in many shares depending of the number of contributors.
     shares = db.relationship('Share', backref='purchase', lazy=True)
 
+    # TODO: This is a quick solution. We should probably use a mapping, maybe at service or route
+    # TODO: level to be able to choose which fields our endpoints should returns.
+    def to_dict(self):
+        """Dict representation of the purchase."""
+        return {
+            'uuid': self.uuid,
+            'status': self.status.value,
+            'amount': self.amount,
+        }
+
 
 class Pledger(BaseModelMixin):
     """Describe a contributor to a Purchase."""
