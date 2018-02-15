@@ -44,7 +44,7 @@ def db(request):
     return _db
 
 
-@pytest.fixture(scope='class')
+@pytest.fixture(scope='function')
 def session(db, request):
     """Creates a new database session for a test."""
     connection = db.engine.connect()
@@ -55,13 +55,8 @@ def session(db, request):
 
     db.session = _session
 
-    def teardown():
-        transaction.rollback()
-        connection.close()
-        _session.remove()
+    yield _session
 
-    request.cls.session = _session
-
-    request.addfinalizer(teardown)
-
-    return session
+    transaction.rollback()
+    connection.close()
+    _session.remove()

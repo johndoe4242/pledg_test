@@ -1,42 +1,48 @@
 import pytest
-import unittest
 
 from sqlalchemy.exc import IntegrityError
 
 from app.models import Pledger, Purchase
 
 
-@pytest.mark.usefixtures('session')
-class PledgerTestCase(unittest.TestCase):
+def test_pledger_insert_with_email(session):
+    """Test to insert a `Pledger` with an email address."""
+    email = 'Jean.Valjean@gmail.com'
+    pledger = Pledger(email=email)
 
-    def test_insert(self):
-        pledger = Pledger(email='jean.valjean@gmail.com')
+    session.add(pledger)
+    session.commit()
 
-        self.session.add(pledger)
-        self.session.commit()
+    # Assert the model has been correctly saved.
+    assert pledger.id > 0
+    # Assert the email has been correctly saved as lower case.
+    assert pledger.email == email.lower()
 
-        assert pledger.id > 0
 
-    def test_unique_email(self):
-        pledger = Pledger(email='jean.valjean@gmail.com')
-
+def test_pledger_unique_email(session):
+    """Assert that an Integrity error is raised if trying to save two pledgers with a same email
+    address."""
+    with pytest.raises(IntegrityError):
         # We add the same user twice to test the `email` field.
-        self.session.add(pledger)
+        session.bulk_save_objects([
+            Pledger(email='jean.valjean@gmail.com'),
+            Pledger(email='jean.valjean@gmail.com')
+        ])
 
-        with pytest.raises(IntegrityError):
-            self.session.commit()
 
+def test_purchase_insert(session):
+    """Test the association of a `Purchase` to a `Pledger`."""
+    # We first make a pledger to initiate the purchase.
+    pledger = Pledger(email='jean.valjean@gmail.com')
+    # We then create a Purchase associated to the `Pledger`.
+    purchase = Purchase(amount=42.50, leader_id=pledger.id)
+    pledger.purchases = [purchase]
 
-@pytest.mark.usefixtures('session')
-class PurchaseTestCase(unittest.TestCase):
+    session.add(pledger)
+    session.commit()
 
-    def test_insert(self):
-        # We first make a pledger to initiate the purchase.
-        pledger = Pledger(email='jean.valjean@gmail.com')
-        purchase = Purchase(amount=42.50, leader_id=pledger.id)
-        pledger.purchases = [purchase]
+    assert pledger.id > 0
 
-        self.session.add(pledger)
-        self.session.commit()
-
-        assert purchase.id > 0
+    assert purchase.id > 0
+    assert purchase.leader_id == pledger.id
+    assert purchase.amount == 42.50
